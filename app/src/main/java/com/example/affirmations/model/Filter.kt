@@ -1,4 +1,4 @@
-package com.example.affirmations.data
+package com.example.affirmations.model
 
 data class Filter(
     val id: Int,

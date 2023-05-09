@@ -1,25 +1,30 @@
-/*
- * Copyright (C) 2021 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.affirmations.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.example.affirmations.data.ArticleResponse
+import com.example.affirmations.data.SourceResponse
 class NewsRepo(val apiService: NewsApiService) {
-    suspend fun loadNews(): List<ArticleResponse>? {
-        return apiService.fetchNews("us").run {
-            this.articles?.map {
-                ArticleResponse(SourceResponse(1,"fd"),"fs","fdsgd","Sgdvb")
+    suspend fun fetchNews(country: String): List<ArticleResponse> {
+        withContext(Dispatchers.IO) {
+            Thread.sleep(5000)
+        }
+        return apiService.fetchNews(country).run {
+            this.articles.map {
+                ArticleResponse(
+                    SourceResponse(it.source?.id ?: "", it.source?.name ?: ""),
+                    it.title ?: "", it.author ?: "", it.urlToImage
+                )
+            }
+        }
+    }
+    suspend fun fetchNewsWithCategory(country: String, category: String, query: String): List<ArticleResponse> {
+        return apiService.fetchNewsWithCategory(country,category,query).run {
+            this.articles.map {
+                ArticleResponse(
+                    SourceResponse(it.source?.id ?: "", it.source?.name ?: ""),
+                    it.title ?: "", it.author ?: "", it.urlToImage
+                )
             }
         }
     }

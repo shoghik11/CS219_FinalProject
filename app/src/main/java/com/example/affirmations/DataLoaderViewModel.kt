@@ -1,30 +1,45 @@
 package com.example.affirmations
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.affirmations.data.NewsRepo
-import com.example.affirmations.data.ArticleResponse
-import com.example.affirmations.data.NewsApiService
-import com.example.affirmations.data.RetrofitHelper
+import com.example.affirmations.data.*
 import kotlinx.coroutines.launch
 
 class DataLoaderViewModel : ViewModel() {
 
-    private val _articleList = MutableLiveData<Result<List<ArticleResponse>>>()
-    val articles: LiveData<Result<List<ArticleResponse>>> =  _articleList
+    private val _articles = MutableLiveData<Result<List<ArticleResponse>>>()
+    val articles: LiveData<Result<List<ArticleResponse>>> = _articles
 
-    fun loadNews() {
+    fun getPosts() {
+        viewModelScope.launch {
+            _articles.postValue(Result.loading())
+            try {
+                val response = NewsRepo(
+                    RetrofitHelper.getInstance().create(NewsApiService::class.java)
+                ).fetchNews("us")
+                _articles.postValue(Result.success(response))
+            } catch (e: Exception) {
+                e.message?.let { Log.e("Error loading ViewModel", it) }
+                _articles.postValue(Result.error(e))
+            }
+        }
+    }
+    fun getPostsWithCategory(category:String,query: String){
         viewModelScope.launch {
             try {
-                val response = NewsRepo(RetrofitHelper.getInstance()
-                    .create(NewsApiService::class.java))
-                    .loadNews()?: emptyList()
-                _articleList.postValue(Result.success(response))
-
+                val response = NewsRepo(
+                    RetrofitHelper.getInstance().create(NewsApiService::class.java)
+                ).fetchNewsWithCategory("us",category,query)
+                if(response.isEmpty()){
+                    _articles.postValue(Result.error(RuntimeException("No data")))
+                } else {
+                    _articles.postValue(Result.success(response))
+                }
             } catch (e: Exception) {
-                _articleList.postValue(Result.error(e))
+                Log.d(">>>", e.message.toString())
             }
         }
     }

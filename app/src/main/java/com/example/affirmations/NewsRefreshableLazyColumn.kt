@@ -1,14 +1,14 @@
-package com.example.randomusergenerator.ui.components
+package com.example.affirmations
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.randomusergenerator.data.model.User
+import com.example.affirmations.data.ArticleResponse
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
-fun UsersRefreshableLazyColumn(
-    data: List<User>,
+fun NewsRefreshableLazyColumn(
+    data: List<ArticleResponse>,
     onRefresh: () -> Unit,
     navController: NavController,
 ) {
@@ -21,6 +21,6 @@ fun UsersRefreshableLazyColumn(
             state.isRefreshing = false
         }
     ) {
-        UsersList(navController, data)
+      //  ArticleList(navController, data)
     }
 }

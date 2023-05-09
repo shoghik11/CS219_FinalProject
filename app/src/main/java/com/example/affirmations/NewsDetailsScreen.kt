@@ -1,5 +1,6 @@
-package com.example.randomusergenerator.ui.screens
+package com.example.affirmations
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,14 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.randomusergenerator.data.model.User
+import com.example.affirmations.data.ArticleResponse
 
 @Composable
-fun UserDetailsScreen(navController: NavController, user: User) {
+fun NewsDetailsScreen(navController: NavController, article: ArticleResponse) {
     Scaffold(topBar = {
         TopAppBar(backgroundColor = Color.Transparent, elevation = 0.dp) {
             Row(
@@ -32,27 +35,47 @@ fun UserDetailsScreen(navController: NavController, user: User) {
                         navController.popBackStack()
                     })
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "User Detail", fontWeight = FontWeight.Bold)
+                Text(text = "News Detail", fontWeight = FontWeight.Bold)
             }
         }
-    }) {it
+    }) { it
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             AsyncImage(
-                model = user.picture.large,
-                contentDescription = "avatar",
+                model = article.urlToImage,
+                contentDescription = article.title,
                 modifier = Modifier
-                    .clip(shape = RoundedCornerShape(30.dp))
-                    .height(100.dp)
-                    .width(100.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(16f/9f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Crop
             )
 
-            Text(text = user.name.title)
-            Text(text = user.name.first)
-            Text(text = user.name.last)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = article.source?.name ?: "",
+                    style = MaterialTheme.typography.subtitle1,
+                )
+
+                Text(
+                    text = article.title ?: "",
+                    style = MaterialTheme.typography.body1,
+                )
+
+                Text(
+                    text = article.author ?: "",
+                    style = MaterialTheme.typography.subtitle2,
+                )
+            }
         }
     }
 }
